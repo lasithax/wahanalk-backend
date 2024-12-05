@@ -18,7 +18,7 @@ public class UserController {
 
   @GetMapping("/test")
   public String test() {
-    return "User registered successfully.";
+    return "Test executed successfully.";
   }
 
   @PostMapping("/register")
