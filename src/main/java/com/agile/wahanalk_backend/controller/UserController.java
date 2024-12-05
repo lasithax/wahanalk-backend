@@ -43,7 +43,7 @@ public class UserController {
       User user = optionalUser.get();
       // Verify password (consider adding hashing in future)
       if (user.getPassword().equals(loginRequest.getPassword())) {
-        return ResponseEntity.ok("Login successful.");
+        return ResponseEntity.status(200).body("200");
       } else {
         return ResponseEntity.status(401).body("Invalid password.");
       }
