@@ -5,6 +5,8 @@ import com.agile.wahanalk_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 // import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @RestController
@@ -30,6 +32,24 @@ public class UserController {
     user.setPassword(user.getPassword());
     userRepository.save(user);
     return ResponseEntity.ok("User registered successfully.");
+  }
+
+  // New login endpoint
+  @PostMapping("/login")
+  public ResponseEntity<String> loginUser(@RequestBody User loginRequest) {
+    Optional<User> optionalUser = userRepository.findByEmail(loginRequest.getEmail());
+
+    if (optionalUser.isPresent()) {
+      User user = optionalUser.get();
+      // Verify password (consider adding hashing in future)
+      if (user.getPassword().equals(loginRequest.getPassword())) {
+        return ResponseEntity.ok("Login successful.");
+      } else {
+        return ResponseEntity.status(401).body("Invalid password.");
+      }
+    } else {
+      return ResponseEntity.status(404).body("User not found.");
+    }
   }
 }
 
