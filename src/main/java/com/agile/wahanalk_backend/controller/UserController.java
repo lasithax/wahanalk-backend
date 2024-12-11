@@ -1,5 +1,6 @@
 package com.agile.wahanalk_backend.controller;
 
+import com.agile.wahanalk_backend.dto.ResetPasswordRequest;
 import com.agile.wahanalk_backend.model.User;
 import com.agile.wahanalk_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,41 @@ public class UserController {
       } else {
         return ResponseEntity.status(401).body("Invalid password.");
       }
+    } else {
+      return ResponseEntity.status(404).body("User not found.");
+    }
+  }
+
+  @GetMapping("/{email}")
+  public ResponseEntity<?> viewProfile(@PathVariable String email) {
+    Optional<User> optionalUser = userRepository.findByEmail(email);
+
+    if (optionalUser.isPresent()) {
+      User user = optionalUser.get();
+      return ResponseEntity.ok(user); // Returns the full user object
+    } else {
+      return ResponseEntity.status(404).body("User not found.");
+    }
+  }
+
+  @PostMapping("/reset-password")
+  public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequest resetPasswordRequest) {
+    Optional<User> optionalUser = userRepository.findByEmail(resetPasswordRequest.getEmail());
+
+    if (optionalUser.isPresent()) {
+      User user = optionalUser.get();
+
+      // Verify current password (if required)
+      if (resetPasswordRequest.getCurrentPassword() != null &&
+        !user.getPassword().equals(resetPasswordRequest.getCurrentPassword())) {
+        return ResponseEntity.status(401).body("Invalid current password.");
+      }
+
+      // Update password
+      user.setPassword(resetPasswordRequest.getNewPassword());
+      userRepository.save(user);
+
+      return ResponseEntity.ok("Password reset successfully.");
     } else {
       return ResponseEntity.status(404).body("User not found.");
     }
