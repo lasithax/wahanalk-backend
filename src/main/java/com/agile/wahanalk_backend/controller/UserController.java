@@ -87,5 +87,31 @@ public class UserController {
       return ResponseEntity.status(404).body("User not found.");
     }
   }
+
+  //Update user by email
+  @PostMapping("/update-user")
+  public ResponseEntity<String> updateUser(@RequestBody User updateUserRequest) {
+    Optional<User> optionalUser = userRepository.findByEmail(updateUserRequest.getEmail());
+
+    if (optionalUser.isPresent()) {
+      User user = optionalUser.get();
+
+      // Update the fields provided in the request
+      if (updateUserRequest.getFirstName() != null) {
+        user.setFirstName(updateUserRequest.getFirstName());
+      }
+      if (updateUserRequest.getLastName() != null) {
+        user.setLastName(updateUserRequest.getLastName());
+      }
+      if (updateUserRequest.getBirthday() != null) {
+        user.setBirthday(updateUserRequest.getBirthday());
+      }
+
+      userRepository.save(user);
+      return ResponseEntity.ok("User updated successfully.");
+    } else {
+      return ResponseEntity.status(404).body("User not found.");
+    }
+  }
 }
 
